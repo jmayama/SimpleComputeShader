@@ -1,0 +1,24 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+//This specifies the entry point to the program (essentially the compute shader’s “main”). 
+//A single compute shader file can have a number of these functions defined, 
+//and you can call whichever one you need from script.
+#pragma kernel Multiply
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+
+struct VecMatPair
+{
+	float3 pos;
+	float4x4 mat;
+};
+
+RWStructuredBuffer<VecMatPair> dataBuffer;
+
+[numthreads(16,1,1)]
+void Multiply (uint3 id : SV_DispatchThreadID)
+{
+    dataBuffer[id.x].pos = mul(dataBuffer[id.x].mat, 
+    				float4(dataBuffer[id.x].pos, 1.0));
+}
